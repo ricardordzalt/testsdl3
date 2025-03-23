@@ -3,8 +3,8 @@
 
 int main()
 {
-    bool isVideoInitialized = SDL_InitSubSystem(SDL_INIT_VIDEO);
-    if (!isVideoInitialized)
+    bool isSdlVideoInitialized = SDL_InitSubSystem(SDL_INIT_VIDEO);
+    if (!isSdlVideoInitialized)
     {
         const char* sdlInitError = SDL_GetError();
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error al inicializar SDL3: %s", sdlInitError);
