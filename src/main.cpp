@@ -3,49 +3,55 @@
 
 int main()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    bool isVideoInitialized = SDL_InitSubSystem(SDL_INIT_VIDEO);
+    if (!isVideoInitialized)
     {
-        std::cerr << "Error al inicializar SDL3: " << SDL_GetError() << std::endl;
+        const char* sdlInitError = SDL_GetError();
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error al inicializar SDL3: %s", sdlInitError);
         return 1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("Ventana SDL3", 800, 600, SDL_WINDOW_RESIZABLE);
-    if (!window)
+    SDL_Window *sdlWindow = SDL_CreateWindow("Ventana SDL3", 800, 600, SDL_WINDOW_RESIZABLE);
+    if (!sdlWindow)
     {
-        std::cerr << "Error al crear la ventana: " << SDL_GetError() << std::endl;
+        const char* sdlWindowError = SDL_GetError();
+
+        SDL_LogError(SDL_LOG_CATEGORY_VIDEO, "Error al crear la ventana: %s", sdlWindowError);
         SDL_Quit();
         return 1;
     }
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
-    if (!renderer)
+    SDL_Renderer *sdlRenderer = SDL_CreateRenderer(sdlWindow, nullptr);
+    if (!sdlRenderer)
     {
-        std::cerr << "Error al crear el renderer: " << SDL_GetError() << std::endl;
-        SDL_DestroyWindow(window);
+        const char* sdlRendererError = SDL_GetError();
+
+        SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Error al crear el renderer: %s", sdlRendererError);
+        SDL_DestroyWindow(sdlWindow);
         SDL_Quit();
         return 1;
     }
 
-    bool running = true;
-    SDL_Event event;
+    bool isApplicationRunning = true;
+    SDL_Event sdlEvent;
 
-    while (running)
+    while (isApplicationRunning)
     {
-        while (SDL_PollEvent(&event))
+        while (SDL_PollEvent(&sdlEvent))
         {
-            if (event.type == SDL_EVENT_QUIT)
+            if (sdlEvent.type == SDL_EVENT_QUIT)
             {
-                running = false;
+                isApplicationRunning = false;
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 128, 255, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(sdlRenderer, 0, 128, 255, 255);
+        SDL_RenderClear(sdlRenderer);
+        SDL_RenderPresent(sdlRenderer);
     }
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(sdlRenderer);
+    SDL_DestroyWindow(sdlWindow);
     SDL_Quit();
 
     return 0;
